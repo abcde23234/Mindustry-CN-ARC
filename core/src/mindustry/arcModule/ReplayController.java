@@ -43,7 +43,6 @@ public class ReplayController {
     ByteBuffer tmpBuf = ByteBuffer.allocate(32768);
     Writes tmpWr = new Writes(new ByteBufferOutput(tmpBuf));
     boolean recording = false, recordEnabled = false;
-    float speed = 1f;
     Table controller = new Table();
     IntMap<Integer> map = new IntMap<>();
     ReplayData now = null;
@@ -104,13 +103,13 @@ public class ReplayController {
                 t.setBackground(Styles.black3);
                 t.table(tt -> {
                     //tt.button("快进10s", () -> skip = timeEscaped() + 10000000000L);//TODO bug
-                    tt.button("倍率x2", () -> setSpeed(speed * 2));
-                    tt.button("倍率/2", () -> setSpeed(speed / 2));
-                    tt.button("暂停回放", () -> setSpeed(0));
-                    tt.button("恢复原速", () -> setSpeed(1));
+                    tt.button("倍率x2", () -> changeGameSpeed(gameSpeed * 2));
+                    tt.button("倍率/2", () -> changeGameSpeed(gameSpeed / 2));
+                    tt.button("暂停回放", () -> changeGameSpeed(0));
+                    tt.button("恢复原速", () -> changeGameSpeed(1));
                     tt.button("回放信息", this::showInfo);
                 }).row();
-                t.label(() -> "当前倍率:" + speed).row();
+                t.label(() -> "当前倍率:" + gameSpeed).row();
                 t.label(() -> {
                     int secs = (int) (length / 1000000000);
                     int escaped = (int) (timeEscaped() / 1000000000);
@@ -191,7 +190,7 @@ public class ReplayController {
     }
 
     synchronized private long timeEscaped() {
-        long escaped = (long) ((Time.nanos() - lastTime) * speed);
+        long escaped = (long) ((Time.nanos() - lastTime) * gameSpeed);
         allTime += escaped;
         lastTime = Time.nanos();
         return allTime;
@@ -228,7 +227,7 @@ public class ReplayController {
     }
 
     public void startPlay(File input) {
-        setSpeed(1);
+        gameSpeed = 1f;
         Reads r = createReads(input);
         if (r == null) return;
         int version = r.i();
@@ -284,10 +283,6 @@ public class ReplayController {
         replaying = false;
     }
 
-    public void setSpeed(float s) {
-        speed = s;
-        Time.setDeltaProvider(() -> Math.min(Core.graphics.getDeltaTime() * 60f * speed, 3f * speed));
-    }
 
     public void showInfo() {
         if(dialog != null) dialog.show();

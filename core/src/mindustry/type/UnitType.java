@@ -698,6 +698,9 @@ public class UnitType extends UnlockableContent{
         stats.add(Stat.estimateDPS,estimateDps());
         stats.add(Stat.ammoType, ammoType.icon());
         stats.add(Stat.ammoCapacity, ammoCapacity);
+        if (crushDamage > 0) {
+            stats.add("碾压伤害(每格)", StatCat.combat, crushDamage * 60f, StatUnit.perSecond);
+        }
 
         stats.add(Stat.flying, flying);
 
@@ -1291,7 +1294,7 @@ public class UnitType extends UnlockableContent{
                 Lines.dashCircle(unit.x, unit.y, maxRange);
             }
 
-            if (!control.input.commandMode && Core.settings.getBool("alwaysShowUnitRTSAi") && unit.isCommandable() && arcInfoControl()) {
+            if (!control.input.commandMode && Core.settings.getBool("alwaysShowUnitRTSAi") && unit.isCommandable() && unit.command().command != null && unit.command().command.name.equals("move") && arcInfoControl()) {
                 Draw.z(Layer.effect);
                 CommandAI ai = unit.command();
                 //draw target line

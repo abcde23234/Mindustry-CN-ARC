@@ -34,6 +34,7 @@ import mindustry.ui.*;
 import mindustry.ui.dialogs.BaseDialog;
 
 import static mindustry.Vars.*;
+import static mindustry.arcModule.RFuncs.arcColorTime;
 import static mindustry.arcModule.RFuncs.calWaveTimer;
 import static mindustry.gen.Tex.*;
 import static mindustry.ui.Styles.*;
@@ -403,15 +404,9 @@ public class HudFragment{
                 info.row();
                 info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).left().style(Styles.outlineLabel).name("fps");
                 info.row();
+                info.label(() -> "倍速: " + String.format("%.2f", gameSpeed)).left().style(Styles.outlineLabel);
+                info.row();
                 if (!android){
-                    info.label(() -> {
-                        float speed = advanceToolTable.timeAcce;
-                        if (advanceToolTable.fpslock) {
-                            speed = Core.graphics.getFramesPerSecond() / advanceToolTable.targetfps;
-                        }
-                        return "倍速: " + String.format("%.2f", speed);
-                    }).left().style(Styles.outlineLabel);
-                    info.row();
                     info.label(() -> "缩放: " + String.format("%.2f", renderer.getScale())).left().style(Styles.outlineLabel);
                     info.row();
                 }
@@ -1125,7 +1120,7 @@ public class HudFragment{
                             else return 1f;
                         })).height(18).growX().row();
                 tt.add(new Bar(
-                        () -> calWaveTimer(),
+                        () -> arcColorTime(state.rules.waveTimer? (int)state.wavetime : (int) state.tick),
                         () -> Color.valueOf("F5DEB3"),
                         () -> state.wavetime / state.rules.waveSpacing)).height(18).growX().row();
                 tt.add(new Bar(

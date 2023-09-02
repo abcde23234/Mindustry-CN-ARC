@@ -611,6 +611,7 @@ public class SettingsMenuDialog extends BaseDialog{
 
             arc.checkPref("unitLogicMoveLine", false);
             arc.checkPref("unitLogicTimerBars", false);
+            arc.checkPref("arcBuildInfo",false);
             arc.checkPref("unitbuildplan", false);
 
             arc.addCategory("arcRTSSupporter");
