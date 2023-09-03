@@ -126,7 +126,10 @@ public class BaseShield extends Block{
             if(!broken){
                 float radius = radius();
                 Unit unit = player.unit();
-                float hitSize = (unit.hitSize / 2f + paramBuild.radius()) - unit.hitSize * 2f;//keep trying
+                float hitSize = 0;
+                if (paramBuild != null) {
+                    hitSize = (unit.hitSize / 2f + paramBuild.radius()) - unit.hitSize * 2f;//keep trying
+                }
 
                 Draw.z(Layer.shields);
 
