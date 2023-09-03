@@ -713,13 +713,14 @@ public class UI implements ApplicationListener, Loadable{
 
     /** Shows a menu that fires a callback when an option is selected. If nothing is selected, -1 is returned. */
     public void showMenu(String title, String message, String[][] options, Intc callback){
+        final Runnable[] r = {() -> callback.get(-1)};
         if (Hack.useWindowedMenu) {
             Window w = WindowedMenu.newMenu(title, message, options, (i, t) -> {
                 callback.get(i);
-                t.onClose = () -> {};
+                r[0] = () -> {};
                 t.remove();
             });
-            w.onClose = () -> callback.get(-1);
+            w.addListener(WindowEvents.close, e -> r[0].run());
             return;
         }
         Dialog dialog = newMenuDialog(title, message, options, (option, myself) -> {
@@ -741,10 +742,10 @@ public class UI implements ApplicationListener, Loadable{
                 return;
             }
             Window w = WindowedMenu.newMenu(title, message, options, (i, t) -> callback.get(i));
-            w.onClose = () -> {
+            w.addListener(WindowEvents.close, e -> {
                 followUpWindowedMenus.remove(menuId);
                 callback.get(-1);
-            };
+            });
             followUpWindowedMenus.put(menuId, w);
             return;
         }
