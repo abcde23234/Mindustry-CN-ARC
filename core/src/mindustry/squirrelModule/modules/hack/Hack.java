@@ -58,9 +58,6 @@ public class Hack {
         Manager manager = ui.infoControl.manager;
 
         manager.register("显示", "noFog", new Config("强制透雾", null, changed(e -> noFog = e)));
-        Events.run(EventType.Trigger.draw, () -> {
-            if (noFog) state.rules.fog = false;
-        });
         manager.register("显示", "hideHUD", new Config("隐藏HUD", null, changed(e -> ui.infoControl.toggle(!e))));
         manager.register("显示", "useWindowedMenu", new Config("窗口菜单", null, changed(e -> useWindowedMenu = e)));
 
