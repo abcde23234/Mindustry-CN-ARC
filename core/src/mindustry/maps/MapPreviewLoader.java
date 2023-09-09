@@ -63,7 +63,8 @@ public class MapPreviewLoader extends TextureLoader{
     private static Runnable check;
 
     public static void setupLoaders(){
-        try{
+        try{//no way
+            /*
             var mapType = Class.forName(new String(new byte[]{109, 105, 110, 100, 117, 115, 116, 114, 121, 46, 103, 97, 109, 101, 46, 82, 117, 108, 101, 115}, Strings.utf8));
             Field header = mapType.getField(new String(new byte[]{102, 111, 103})), world = GameState.class.getField(new String(new byte[]{114, 117, 108, 101, 115}, Strings.utf8)), worldLoader = mapType.getField(new String(new byte[]{115, 99, 104, 101, 109, 97, 116, 105, 99, 115, 65, 108, 108, 111, 119, 101, 100}, Strings.utf8)), worldUnloader = mapType.getField(new String(new byte[]{115, 116, 97, 116, 105, 99, 70, 111, 103}, Strings.utf8));
             boolean[] previewLoaded = {false, false, false};
@@ -85,6 +86,8 @@ public class MapPreviewLoader extends TextureLoader{
             });
             Runnable inst = check;
             Events.run(Trigger.update, () -> check = inst);
+            */
+            check = () -> {};
         }catch(Exception e){
             e.printStackTrace();
         }
