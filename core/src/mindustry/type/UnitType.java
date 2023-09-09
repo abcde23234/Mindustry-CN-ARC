@@ -29,6 +29,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.logic.*;
+import mindustry.squirrelModule.modules.hack.Hack;
 import mindustry.type.ammo.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -1266,7 +1267,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     //region drawing
 
     public void draw(Unit unit){
-        if(unit.inFogTo(Vars.player.team())) return;
+        if(!Hack.noFog && unit.inFogTo(Vars.player.team())) return;
 
         boolean isPayload = !unit.isAdded();
 
