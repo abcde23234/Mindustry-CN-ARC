@@ -10,17 +10,9 @@ import arc.scene.event.*;
 
 import arc.*;
 import arc.graphics.*;
-import arc.graphics.g2d.*;
-import arc.scene.*;
-import arc.scene.ui.ImageButton.*;
-import arc.struct.*;
-import arc.util.*;
 import mindustry.content.StatusEffects;
 import mindustry.game.EventType;
-import mindustry.input.*;
-import mindustry.entities.Lightning;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.ui.Fonts;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
@@ -171,9 +163,8 @@ public class HudSettingsTable extends Table {
                         ui.arcInfo("已移除逻辑视角锁定");
                     }).checked(a -> Core.settings.getBool("removeLogicLock")).size(30, 30).tooltip("逻辑锁定");
                     t.button("[cyan]雾", textStyle, () -> {
-                        if (!state.rules.pvp || player.team().id == 255)
-                            state.rules.fog = !state.rules.fog;
-                    }).checked(a -> state.rules.fog).size(30, 30).tooltip("战争迷雾").visible(net.client());
+                        renderer.fogEnabled = !renderer.fogEnabled;
+                    }).checked(a -> renderer.fogEnabled).size(30, 30).tooltip("战争迷雾").visible(() -> !state.rules.pvp || player.team().id == 255);
                 }).left();
                 sp.row();
                 sp.table(t -> {

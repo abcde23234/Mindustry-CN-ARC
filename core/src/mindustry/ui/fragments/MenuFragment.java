@@ -3,6 +3,8 @@ package mindustry.ui.fragments;
 import arc.Core;
 import arc.Events;
 import arc.graphics.Color;
+import arc.graphics.Pixmap;
+import arc.graphics.Texture;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Interp;
@@ -16,11 +18,14 @@ import arc.scene.ui.Button;
 import arc.scene.ui.Image;
 import arc.scene.ui.ImageButton.ImageButtonStyle;
 import arc.scene.ui.Label;
+import arc.scene.ui.ScrollPane;
 import arc.scene.ui.layout.Scl;
 import arc.scene.ui.layout.Table;
 import arc.scene.ui.layout.WidgetGroup;
 import arc.struct.Seq;
 import arc.util.*;
+import mindustry.Vars;
+import mindustry.arcModule.ui.window.Window;
 import mindustry.core.Version;
 import mindustry.game.EventType;
 import mindustry.game.EventType.ResizeEvent;
@@ -32,6 +37,10 @@ import mindustry.ui.Fonts;
 import mindustry.ui.MobileButton;
 import mindustry.ui.Styles;
 
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static mindustry.Vars.*;
 import static mindustry.gen.Tex.discordBanner;
 
@@ -42,7 +51,7 @@ public class MenuFragment{
     private Seq<MenuButton> customButtons = new Seq<>();
     Label textLabel;
     float tx, ty, base;
-    String[] labels = { "学术端!" };
+    String[] labels = { "[yellow]学术端!" };
     float period = 75f;
     float varSize = 0.8f;
     String text = labels[0];
@@ -125,8 +134,7 @@ public class MenuFragment{
             Fonts.outline.draw(versionText+arcversionText, fx, fy - logoh/2f - Scl.scl(2f), Align.center);
         }).touchable = Touchable.disabled;
 
-        textGroup.setTransform(true);//松鼠:这个文字旋转要了我3天时间 臭猫的arc库不是标准libgdx 网上一堆教程都用不了
-        //最后还是搜libgdx旋转文字方法 在 https://www.cnblogs.com/keanuyaoo/p/3320223.html 找到了setRotation不起作用的原因
+        textGroup.setTransform(true);
         textGroup.setRotation(20);
         textGroup.addChild(textLabel = new Label(""));
         textGroup.visible(() -> Core.settings.getBool("menuFloatText", true));
@@ -137,7 +145,7 @@ public class MenuFragment{
             textLabel.setFontScale((base == 0 ? 1f : base) * Math.abs(Time.time % period / period - 0.5f) * varSize + 1);
             textLabel.setText(text);
         });
-        Events.on(EventType.ClientLoadEvent.class, event -> Http.get(userContentURL + "/CN-ARC/Mindustry-CN-ARC/master/core/assets/labels")
+        Events.on(EventType.ClientLoadEvent.class, event -> Time.run(10f, () -> Http.get("https://cn-arc.github.io/labels?t=" + Time.millis())
                 .error(e -> {
                     Log.err("获取最新主页标语失败!加载本地标语", e);
                     labels = Core.files.internal("labels").readString("UTF-8").replace("\r", "").replace("\\n", "\n").replace("/n", "\n").split("\n");
@@ -147,7 +155,85 @@ public class MenuFragment{
                     labels = result.getResultAsString().replace("\r", "").replace("\\n", "\n").replace("/n", "\n").split("\n");
                     Core.app.post(this::randomLabel);
                 })
-        );
+        ));
+
+
+        Events.on(EventType.ClientLoadEvent.class, event -> {
+            if (Core.settings.getBool("arcNews", true)) {
+                Time.run(10f, () -> Http.get("https://cn-arc.github.io/news?t=" + Time.millis(), result -> {
+                    String s = result.getResultAsString();
+                    Core.app.post(() -> {
+                        Pattern imgPattern = Pattern.compile("\\{image:(.*?)}");
+                        String[] news = s.replace("\r", "").split("\n");
+                        boolean haveNews = false;
+                        Table t = new Table();
+                        ScrollPane p = new ScrollPane(t);
+                        for (int i = 0; i < news.length; i += 3) {
+                            if (Time.millis() - Long.parseLong(news[0]) < 86400000 * 14) {//14天
+                                haveNews = true;
+                                t.table(t2 -> {
+                                    t2.image().color(Vars.getThemeColor()).height(3).growX().row();
+                                    t2.add(formatTimeElapsed(Time.millis() - Long.parseLong(news[0]))).align(Align.left).row();
+                                    t2.table(t3 -> {
+                                        String n = news[1].replace("\\n", "\n");
+                                        Matcher matcher = imgPattern.matcher(n);
+                                        int previousEnd = 0;
+                                        while (matcher.find()) {
+                                            int start = matcher.start();
+                                            int end = matcher.end();
+                                            if (previousEnd < start) {
+                                                t3.add(n.substring(previousEnd, start)).row();
+                                            }
+                                            Image img = t3.image(Icon.refresh.getRegion()).size(128).get();
+                                            t3.row();
+                                            Http.get(matcher.group(1), r -> {
+                                                byte[] b = r.getResult();
+                                                Core.app.post(() -> {
+                                                    Pixmap pix = new Pixmap(b);
+                                                    t3.getCell(img).size(pix.width, pix.height);
+                                                    img.setDrawable(new TextureRegion(new Texture(pix)));
+                                                    pix.dispose();
+                                                });
+                                            });
+                                            previousEnd = end;
+                                        }
+                                        if (previousEnd < n.length()) {
+                                            t3.add(n.substring(previousEnd));
+                                        }
+                                    }).growX().row();
+                                    t2.add(news[2]).align(Align.right);
+                                }).pad(5).growX().row();
+                            }
+                        }
+                        if (!haveNews) {
+                            t.add("这里什么都没有");
+                        }
+                        Window w = new Window("学术日报", 600, 400, Icon.book.getRegion(), ui.WindowManager);
+                        w.setBody(new Table(t2 -> t2.add(p).grow()) {{
+                            setBackground(Styles.black3);
+                        }});
+                        w.add();
+                    });
+                }));
+            }
+        });
+    }
+
+    public static String formatTimeElapsed(long milliseconds) {
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds);
+        long hours = TimeUnit.MILLISECONDS.toHours(milliseconds);
+        long days = TimeUnit.MILLISECONDS.toDays(milliseconds);
+
+        if (days > 0) {
+            return days + "天前";
+        } else if (hours > 0) {
+            return hours + "小时前";
+        } else if (minutes > 0) {
+            return minutes + "分钟前";
+        } else {
+            return seconds + "秒前";
+        }
     }
 
     private void randomLabel(){

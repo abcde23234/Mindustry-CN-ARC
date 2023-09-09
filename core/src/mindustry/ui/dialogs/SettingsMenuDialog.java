@@ -695,6 +695,7 @@ public class SettingsMenuDialog extends BaseDialog{
             arc.checkPref("menuFlyersFollower", false);
             arc.checkPref("menuFloatText", true);
             arc.checkPref("showUpdateDialog", true);
+            arc.checkPref("arcNews", true);
 
             //////////forcehide
             forcehide.addCategory("arcCDisplayBlock");
