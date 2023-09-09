@@ -163,7 +163,7 @@ public class MenuFragment{
                 Time.run(10f, () -> Http.get("https://cn-arc.github.io/news?t=" + Time.millis(), result -> {
                     String s = result.getResultAsString();
                     Core.app.post(() -> {
-                        Pattern imgPattern = Pattern.compile("\\{image:(.*?)}");
+                        Pattern imgPattern = Pattern.compile("\\{image:(.*?)\\}");//dalvik特性 花括号必须转义
                         String[] news = s.replace("\r", "").split("\n");
                         boolean haveNews = false;
                         Table t = new Table();
