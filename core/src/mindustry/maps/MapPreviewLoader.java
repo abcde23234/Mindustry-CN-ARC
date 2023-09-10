@@ -12,6 +12,7 @@ import mindustry.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
+import mindustry.squirrelModule.modules.hack.Hack;
 
 import java.lang.reflect.*;
 
@@ -81,7 +82,7 @@ public class MapPreviewLoader extends TextureLoader{
                 previewLoaded[2] = false;
             });
             Events.run(Trigger.update, check = () -> {
-                if(previewLoaded[0]) Reflect.set(sup.get(), header, (state.rules.pvp && player.team().id != 255) || renderer.fogEnabled);
+                if(previewLoaded[0]) Reflect.set(sup.get(), header, !Hack.noFog && (state.rules.pvp && player.team().id != 255) || renderer.fogEnabled);
                 if(previewLoaded[1]) Reflect.set(sup.get(), worldLoader, false);
                 if(previewLoaded[2]) Reflect.set(sup.get(), worldUnloader, true);
             });
