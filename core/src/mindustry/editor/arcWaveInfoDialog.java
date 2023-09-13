@@ -352,13 +352,12 @@ public class arcWaveInfoDialog extends BaseDialog {
                 }).scrollX(false).growX().row();
                 tb.table(tbb -> {
                     tbb.button("刷新波次显示", () -> setup()).width(200f);
-                    TextField sField = tbb.field(calWinWave() * waveMulti + "", text -> {
-                        waveMulti = Float.parseFloat(text) / calWinWave();
-                        setup();
+                    TextField sField = tbb.field(calWinWave() * (int) waveMulti + "", text -> {
+                        waveMulti = (Float.parseFloat(text) / calWinWave());
                     }).valid(Strings::canParsePositiveFloat).width(200f).get();
                     tbb.slider(0.25f, 10f, 0.25f, 1f, t -> {
                         waveMulti = t;
-                        sField.setText(calWinWave() * waveMulti + "");
+                        sField.setText(calWinWave() * (int) waveMulti + "");
                     }).width(300f);
                 });
             }
