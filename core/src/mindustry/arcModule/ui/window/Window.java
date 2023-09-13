@@ -31,7 +31,7 @@ import static mindustry.Vars.ui;
 public class Window {
     public WindowTable table;
     WindowManager manager;
-    String title;
+    String title, titlePrefix;
     Table cont;
     TextureRegion icon;
     public Image iconImage;
@@ -226,8 +226,8 @@ public class Window {
                 t.add(iconImage).size(12).pad(10, 12, 10, 12);
                 t.table(tt -> {
                     tt.add("").update(l -> {
-                        l.setText(calcString(title, l.getWidth()));
-                        l.setColor(front == Window.this ? Color.black : Color.gray);
+                        l.setText(calcString("[#" + titlePrefix + "]" + title, l.getWidth()));
+                        titlePrefix = front == Window.this ? Color.black.toString() : Color.gray.toString();
                     }).grow();
                     tt.addListener(new InputListener() {
                         float lastX, lastY;

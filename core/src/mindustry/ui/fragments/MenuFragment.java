@@ -25,11 +25,13 @@ import arc.scene.ui.layout.WidgetGroup;
 import arc.struct.Seq;
 import arc.util.*;
 import mindustry.Vars;
+import mindustry.arcModule.ui.RStyles;
 import mindustry.arcModule.ui.window.Window;
 import mindustry.core.Version;
 import mindustry.game.EventType;
 import mindustry.game.EventType.ResizeEvent;
 import mindustry.gen.Icon;
+import mindustry.gen.Tex;
 import mindustry.graphics.MenuRenderer;
 import mindustry.graphics.Pal;
 import mindustry.service.GameService;
@@ -38,11 +40,10 @@ import mindustry.ui.MobileButton;
 import mindustry.ui.Styles;
 
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static mindustry.Vars.*;
 import static mindustry.gen.Tex.discordBanner;
+import static mindustry.ui.Styles.cleart;
 
 public class MenuFragment{
     private Table container, submenu;
@@ -55,6 +56,9 @@ public class MenuFragment{
     float period = 75f;
     float varSize = 0.8f;
     String text = labels[0];
+    static long arcNewsLastUpdate = 0;
+    static boolean haveNewerNews = false;
+
     public void build(Group parent){
         renderer = new MenuRenderer();
 
@@ -157,65 +161,156 @@ public class MenuFragment{
                 })
         ));
 
+        arcNewsLastUpdate = Core.settings.getLong("arcNewsLastUpdate", 0);
+        Events.on(EventType.ClientLoadEvent.class, event -> Timer.schedule(MenuFragment::fetchArcNews, 0, 60));
 
-        Events.on(EventType.ClientLoadEvent.class, event -> {
-            if (Core.settings.getBool("arcNews", true)) {
-                Time.run(10f, () -> Http.get("https://cn-arc.github.io/news?t=" + Time.millis(), result -> {
-                    String s = result.getResultAsString();
-                    Core.app.post(() -> {
-                        Pattern imgPattern = Pattern.compile("\\{image:(.*?)\\}");//dalvik特性 花括号必须转义
-                        String[] news = s.replace("\r", "").split("\n");
-                        boolean haveNews = false;
-                        Table t = new Table();
-                        ScrollPane p = new ScrollPane(t);
-                        for (int i = 0; i < news.length; i += 3) {
-                            if (Time.millis() - Long.parseLong(news[0]) < 86400000 * 14) {//14天
-                                haveNews = true;
-                                t.table(t2 -> {
-                                    t2.image().color(Vars.getThemeColor()).height(3).growX().row();
-                                    t2.add(formatTimeElapsed(Time.millis() - Long.parseLong(news[0]))).align(Align.left).row();
-                                    t2.table(t3 -> {
-                                        String n = news[1].replace("\\n", "\n");
-                                        Matcher matcher = imgPattern.matcher(n);
-                                        int previousEnd = 0;
-                                        while (matcher.find()) {
-                                            int start = matcher.start();
-                                            int end = matcher.end();
-                                            if (previousEnd < start) {
-                                                t3.add(n.substring(previousEnd, start)).row();
-                                            }
-                                            Image img = t3.image(Icon.refresh.getRegion()).size(128).get();
-                                            t3.row();
-                                            Http.get(matcher.group(1), r -> {
-                                                byte[] b = r.getResult();
-                                                Core.app.post(() -> {
-                                                    Pixmap pix = new Pixmap(b);
-                                                    t3.getCell(img).size(pix.width, pix.height);
-                                                    img.setDrawable(new TextureRegion(new Texture(pix)));
-                                                    pix.dispose();
-                                                });
-                                            });
-                                            previousEnd = end;
-                                        }
-                                        if (previousEnd < n.length()) {
-                                            t3.add(n.substring(previousEnd));
-                                        }
-                                    }).growX().row();
-                                    t2.add(news[2]).align(Align.right);
-                                }).pad(5).growX().row();
-                            }
-                        }
-                        if (!haveNews) {
-                            t.add("这里什么都没有");
-                        }
-                        Window w = new Window("学术日报", 600, 400, Icon.book.getRegion(), ui.WindowManager);
-                        w.setBody(new Table(t2 -> t2.add(p).grow()) {{
-                            setBackground(Styles.black3);
-                        }});
-                        w.add();
-                    });
-                }));
+        parent.fill(c -> c.top().left().table(t -> {
+            t.background(Tex.buttonEdge4);
+            t.button("学术日报", cleart, MenuFragment::showArcNews).left().width(100).expandX();
+        }).left().update(t -> t.getChildren().get(0).setColor(haveNewerNews ? Tmp.c1.set(Color.white).lerp(Pal.accent, Mathf.absin(5f, 1f)) : Color.white)));
+    }
+
+    public static void fetchArcNews() {
+        Http.get("https://cn-arc.github.io/news?t=" + Time.millis(), result -> {
+            try {
+                String s = result.getResultAsString();
+                long last = Long.parseLong(s.substring(0, s.indexOf('\n')));
+                if (arcNewsLastUpdate < last) {
+                    arcNewsLastUpdate = last;
+                    haveNewerNews = true;
+                    if (Core.settings.getBool("autoArcNews", false)) Core.app.post(MenuFragment::showArcNews);
+                }
+            } catch (Exception e) {
+                Log.err(e);
             }
+        });
+    }
+
+    public static void showArcNews() {
+        Core.settings.put("arcNewsLastUpdate", arcNewsLastUpdate);
+        haveNewerNews = false;
+        Http.get("https://cn-arc.github.io/news?t=" + Time.millis(), result -> {
+            String s = result.getResultAsString();
+            Core.app.post(() -> {
+                try {
+                    String[] news = s.replace("\r", "").split("\n");
+                    boolean haveNews = false;
+                    Table t = new Table();
+                    ScrollPane p = new ScrollPane(t);
+                    for (int i = 0; i < news.length; i += 3) {
+                        haveNews = true;
+                        int idx = news[i + 1].indexOf(' ');
+                        int id = i;
+                        t.table(t2 -> t2.check("有更新时自动显示", b -> Core.settings.put("autoArcNews", b)).row()).growX();
+                        t.button(b -> {
+                            b.clearChildren();
+                            b.add(idx == -1 ? news[id + 1].substring(0, 10) + "..." : news[id + 1].substring(0, idx)).padLeft(5);
+                            b.add().grow();
+                            b.add(formatTimeElapsed(Time.millis() - Long.parseLong(news[id]))).padRight(5);
+                        }, RStyles.flatt, () -> {
+                            Window w = new Window();
+                            Table content = new Table();
+                            ScrollPane pane = new ScrollPane(content);
+                            content.table(t2 -> {
+                                t2.image().color(Vars.getThemeColor()).height(3).growX().row();
+                                t2.add(formatTimeElapsed(Time.millis() - Long.parseLong(news[id]))).align(Align.left).row();
+                                t2.table(t3 -> {
+                                    String n = (idx == -1 ? news[id + 1] : news[id + 1].substring(idx + 1)).replace("\\n", "\n");
+                                    StringBuilder sb = new StringBuilder();
+                                    Table there = new Table();
+                                    for (int ptr = 0, l = n.length(); ptr < l; ptr++) {
+                                        char c = n.charAt(ptr);
+                                        Table finalThere = there;
+                                        switch (c) {
+                                            case '\\' -> {
+                                                if (ptr + 1 < l) {
+                                                    sb.append(n.charAt(ptr + 1));
+                                                    ptr++;
+                                                }
+                                            }
+                                            case '{' -> {
+                                                int left = 0, right = 0;
+                                                for (int ptr2 = ptr; ptr2 < l; ptr2++) {
+                                                    switch (n.charAt(ptr2)) {
+                                                        case '{' -> left++;
+                                                        case '}' -> right++;
+                                                    }
+                                                    if (left == right) {
+                                                        String sub = n.substring(ptr + 1, ptr2);
+                                                        int index = sub.indexOf(':');
+                                                        if (index == -1) {
+                                                            sb.append(n, ptr, ptr2 + 1);
+                                                            ptr = ptr2;
+                                                            break;
+                                                        }
+                                                        String cont = sub.substring(index + 1);
+                                                        boolean found = true;
+                                                        String out = "";
+                                                        switch (sub.substring(0, index)) {
+                                                            case "image" -> {
+                                                                if (sb.length() != 0) there.add(sb.toString());
+                                                                Image img = there.image(Icon.refresh.getRegion()).size(64).get();
+                                                                Http.get(cont, r -> {
+                                                                    byte[] b = r.getResult();
+                                                                    Core.app.post(() -> {
+                                                                        Pixmap pix = new Pixmap(b);
+                                                                        finalThere.getCell(img).size(pix.width, pix.height);
+                                                                        img.setDrawable(new TextureRegion(new Texture(pix)));
+                                                                        pix.dispose();
+                                                                    });
+                                                                });
+                                                            }
+                                                            case "eval" -> {
+                                                                sb.append(mods.getScripts().runConsole(cont));
+                                                                there.add(sb.toString());
+                                                            }
+                                                            default -> {
+                                                                found = false;
+                                                                sb.append(n, ptr, ptr2 + 1);
+                                                            }
+                                                        }
+                                                        if (found) {
+                                                            sb.setLength(0);
+                                                            System.out.println(out);
+                                                            ptr = ptr2;
+                                                        }
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            case '\n' -> {
+                                                if (sb.length() != 0) there.add(sb.toString());
+                                                sb.setLength(0);
+                                                t3.add(there).row();
+                                                there = new Table();
+                                            }
+                                            default -> sb.append(c);
+                                        }
+                                    }
+                                    if (sb.length() != 0) there.add(sb.toString());
+                                    t3.add(there);
+                                }).growX().row();
+                                t2.add(news[2]).align(Align.right);
+                            }).pad(5).growX().row();
+                            w.setBody(new Table(t2 -> {
+                                t2.setBackground(Styles.black3);
+                                t2.add(pane).grow();
+                            }));
+                            w.add();
+                        }).minHeight(40).growX().row();
+                    }
+                    if (!haveNews) {
+                        t.add("这里什么都没有");
+                    }
+                    Window w = new Window("学术日报", 600, 400, Icon.book.getRegion(), ui.WindowManager);
+                    w.setBody(new Table(t2 -> t2.add(p).grow()) {{
+                        setBackground(Styles.black3);
+                    }});
+                    w.add();
+                } catch (Exception e) {
+                    Log.err(e);
+                }
+            });
         });
     }
 
@@ -251,19 +346,19 @@ public class MenuFragment{
         initAchievement();
 
         MobileButton
-            play = new MobileButton(Icon.play, "@campaign", () -> checkPlay(ui.planet::show)),
-            custom = new MobileButton(Icon.rightOpenOut, "@customgame", () -> checkPlay(ui.custom::show)),
-            maps = new MobileButton(Icon.download, "@loadgame", () -> checkPlay(ui.load::show)),
-            join = new MobileButton(Icon.add, "@joingame", () -> checkPlay(ui.join::show)),
-            editor = new MobileButton(Icon.terrain, "@editor", () -> checkPlay(ui.maps::show)),
-            tools = new MobileButton(Icon.settings, "@settings", ui.settings::show),
-            mods = new MobileButton(Icon.book, "@mods", ui.mods::show),
-            exit = new MobileButton(Icon.exit, "@quit", () -> Core.app.exit()),
-            cn_arc = new MobileButton(Icon.info,"@aboutcn_arc.button",  ui.aboutcn_arc::show),
-            //mindustrywiki = new MobileButton(Icon.book, "@mindustrywiki.button", ui.mindustrywiki::show),
-            updatedialog = new MobileButton(Icon.info,"@updatedialog.button",  ui.updatedialog::show),
-            database = new MobileButton(Icon.book, "@database",  ui.database::show),
-            achievements = new MobileButton(Icon.star, "@achievements",  ui.achievements::show);
+                play = new MobileButton(Icon.play, "@campaign", () -> checkPlay(ui.planet::show)),
+                custom = new MobileButton(Icon.rightOpenOut, "@customgame", () -> checkPlay(ui.custom::show)),
+                maps = new MobileButton(Icon.download, "@loadgame", () -> checkPlay(ui.load::show)),
+                join = new MobileButton(Icon.add, "@joingame", () -> checkPlay(ui.join::show)),
+                editor = new MobileButton(Icon.terrain, "@editor", () -> checkPlay(ui.maps::show)),
+                tools = new MobileButton(Icon.settings, "@settings", ui.settings::show),
+                mods = new MobileButton(Icon.book, "@mods", ui.mods::show),
+                exit = new MobileButton(Icon.exit, "@quit", () -> Core.app.exit()),
+                cn_arc = new MobileButton(Icon.info,"@aboutcn_arc.button",  ui.aboutcn_arc::show),
+                //mindustrywiki = new MobileButton(Icon.book, "@mindustrywiki.button", ui.mindustrywiki::show),
+                updatedialog = new MobileButton(Icon.info,"@updatedialog.button",  ui.updatedialog::show),
+                database = new MobileButton(Icon.book, "@database",  ui.database::show),
+                achievements = new MobileButton(Icon.star, "@achievements",  ui.achievements::show);
 
         play.clicked(this::randomLabel);
         custom.clicked(this::randomLabel);
@@ -383,35 +478,35 @@ public class MenuFragment{
 
             if(Core.settings.getInt("changelogreaded") != changeLogRead) {
                 buttons(t,
-                    new MenuButton("@database.button", Icon.menu,
-                            new MenuButton("@schematics", Icon.paste, ui.schematics::show),
-                            new MenuButton("@database", Icon.book, ui.database::show),
-                            new MenuButton("@about.button", Icon.info, ui.about::show),
-                            new MenuButton("@updatedialog.button", Icon.distribution, ui.updatedialog::show)
-                    ),
-                    new MenuButton("@settings", Icon.settings, ui.settings::show),
-                    new MenuButton("@aboutcn_arc.button", Icon.info, ui.aboutcn_arc::show)
+                        new MenuButton("@database.button", Icon.menu,
+                                new MenuButton("@schematics", Icon.paste, ui.schematics::show),
+                                new MenuButton("@database", Icon.book, ui.database::show),
+                                new MenuButton("@about.button", Icon.info, ui.about::show),
+                                new MenuButton("@updatedialog.button", Icon.distribution, ui.updatedialog::show)
+                        ),
+                        new MenuButton("@settings", Icon.settings, ui.settings::show),
+                        new MenuButton("@aboutcn_arc.button", Icon.info, ui.aboutcn_arc::show)
                 );
             } else {
                 buttons(t,
-                    new MenuButton("@play", Icon.play,
-                        new MenuButton("@campaign", Icon.play, () -> checkPlay(ui.planet::show)),
-                        new MenuButton("@joingame", Icon.add, () -> checkPlay(ui.join::show)),
-                        new MenuButton("@customgame", Icon.terrain, () -> checkPlay(ui.custom::show)),
-                        new MenuButton("@loadgame", Icon.download, () -> checkPlay(ui.load::show)),
-                        new MenuButton("@editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new MenuButton("@workshop", Icon.steam, platform::openWorkshop) : null
-                    ),
-                    new MenuButton("@database.button", Icon.menu,
-                        new MenuButton("@schematics", Icon.paste, ui.schematics::show),
-                        new MenuButton("@database", Icon.book, ui.database::show),
-                        new MenuButton("@about.button", Icon.info, ui.about::show),
-                        new MenuButton("@updatedialog.button", Icon.distribution, ui.updatedialog::show)
-                    ),
+                        new MenuButton("@play", Icon.play,
+                                new MenuButton("@campaign", Icon.play, () -> checkPlay(ui.planet::show)),
+                                new MenuButton("@joingame", Icon.add, () -> checkPlay(ui.join::show)),
+                                new MenuButton("@customgame", Icon.terrain, () -> checkPlay(ui.custom::show)),
+                                new MenuButton("@loadgame", Icon.download, () -> checkPlay(ui.load::show)),
+                                new MenuButton("@editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new MenuButton("@workshop", Icon.steam, platform::openWorkshop) : null
+                        ),
+                        new MenuButton("@database.button", Icon.menu,
+                                new MenuButton("@schematics", Icon.paste, ui.schematics::show),
+                                new MenuButton("@database", Icon.book, ui.database::show),
+                                new MenuButton("@about.button", Icon.info, ui.about::show),
+                                new MenuButton("@updatedialog.button", Icon.distribution, ui.updatedialog::show)
+                        ),
 
-                    new MenuButton("@achievements", Icon.star, ui.achievements::show),
-                    new MenuButton("@mods", Icon.book, ui.mods::show),
-                    new MenuButton("@settings", Icon.settings, ui.settings::show),
-                    new MenuButton("@aboutcn_arc.button", Icon.info, ui.aboutcn_arc::show)
+                        new MenuButton("@achievements", Icon.star, ui.achievements::show),
+                        new MenuButton("@mods", Icon.book, ui.mods::show),
+                        new MenuButton("@settings", Icon.settings, ui.settings::show),
+                        new MenuButton("@aboutcn_arc.button", Icon.info, ui.aboutcn_arc::show)
                 );
 
             }
