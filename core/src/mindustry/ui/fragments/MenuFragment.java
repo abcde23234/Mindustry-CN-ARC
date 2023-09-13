@@ -201,7 +201,7 @@ public class MenuFragment{
                         haveNews = true;
                         int idx = news[i + 1].indexOf(' ');
                         int id = i;
-                        t.table(t2 -> t2.check("有更新时自动显示", b -> Core.settings.put("autoArcNews", b)).row()).growX();
+                        t.table(t2 -> t2.check("有更新时自动显示", b -> Core.settings.put("autoArcNews", b)).checked(Core.settings.getBool("autoArcNews", false)).row()).growX();
                         t.button(b -> {
                             b.clearChildren();
                             b.add(idx == -1 ? news[id + 1].substring(0, 10) + "..." : news[id + 1].substring(0, idx)).padLeft(5);

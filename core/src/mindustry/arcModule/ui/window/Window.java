@@ -226,8 +226,7 @@ public class Window {
                 t.add(iconImage).size(12).pad(10, 12, 10, 12);
                 t.table(tt -> {
                     tt.add("").update(l -> {
-                        l.setText(calcString("[#" + titlePrefix + "]" + title, l.getWidth()));
-                        titlePrefix = front == Window.this ? Color.black.toString() : Color.gray.toString();
+                        l.setText(calcString("[#" + (front == Window.this ? Color.black : Color.gray) + "]" +  title, l.getWidth()));
                     }).grow();
                     tt.addListener(new InputListener() {
                         float lastX, lastY;
