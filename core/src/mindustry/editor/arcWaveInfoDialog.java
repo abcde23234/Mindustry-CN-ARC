@@ -390,10 +390,13 @@ public class arcWaveInfoDialog extends BaseDialog {
                     t.button(b -> {
                         b.left();
                         b.image(group.type.uiIcon).size(32f).padRight(3).scaling(Scaling.fit);
-                        //if(group.effect != null && group.effect != StatusEffects.none) b.image(group.effect.uiIcon).size(20f).padRight(3).scaling(Scaling.fit);
                         b.add(group.type.typeColor() + group.type.localizedName);
                         if (group.effect != null && group.effect != StatusEffects.none)
                             b.image(group.effect.uiIcon).size(20f).padRight(3).scaling(Scaling.fit);
+                        if (group.items != null && group.items.amount > 0)
+                            b.image(group.items.item.uiIcon).size(20f).padRight(3).scaling(Scaling.fit);
+                        if (group.payloads != null && group.payloads.size > 0)
+                            b.image(Icon.uploadSmall).size(20f).padRight(3).scaling(Scaling.fit);
 
                         b.add().growX();
 
