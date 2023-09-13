@@ -179,8 +179,10 @@ public class SchematicsDialog extends BaseDialog{
 
             in.button(Icon.refreshSmall, this::syncPlanetTags).size(tagh).pad(2).tooltip("刷新");
             in.add("辅助筛选：").padLeft(20f).padRight(4);
-            in.button(copper.emoji(), Styles.togglet, () -> Core.settings.put("arcSchematicCanBuild", !Core.settings.getBool("arcSchematicCanBuild"))
-                ).size(tagh).pad(2).tooltip("可建造(核心有此类资源+地图未禁用)").checked(t->Core.settings.getBool("arcSchematicCanBuild"));
+            in.button(copper.emoji(), Styles.togglet, () -> {
+                        Core.settings.put("arcSchematicCanBuild", !Core.settings.getBool("arcSchematicCanBuild"));
+                        rebuildPane.run();
+                    }).size(tagh).pad(2).tooltip("可建造(核心有此类资源+地图未禁用)").checked(t->Core.settings.getBool("arcSchematicCanBuild"));
         }).height(tagh).fillX();
 
         cont.row();
