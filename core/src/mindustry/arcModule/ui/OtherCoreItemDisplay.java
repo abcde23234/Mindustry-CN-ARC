@@ -7,6 +7,7 @@ import arc.graphics.g2d.TextureRegion;
 import arc.scene.ui.TextButton;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
+import arc.util.Nullable;
 import arc.util.Strings;
 import arc.util.Time;
 import mindustry.Vars;
@@ -153,6 +154,7 @@ public class OtherCoreItemDisplay extends Table {
             addTeamData(teamsTable, UnitTypes.zenith.uiIcon, team -> state.rules.unitCrashDamage(team));
             addTeamData(teamsTable, UnitTypes.poly.uiIcon, team -> state.rules.buildSpeed(team));
             addTeamData(teamsTable, Blocks.tetrativeReconstructor.uiIcon, team -> state.rules.unitBuildSpeed(team));
+            addTeamData(teamsTable, Blocks.basicAssemblerModule.uiIcon, team -> state.rules.unitCost(team));
             teamsTable.row();
         }
 
@@ -222,16 +224,18 @@ public class OtherCoreItemDisplay extends Table {
             if (value == -1) value = checked.get(teamData.team);
             else if (value != checked.get(teamData.team)) sameValue = false;
         }
-        if (show) {
-            teamsTable.row();
-            table.image(icon).size(15, 15).left();
-            if (sameValue) {
-                float finalValue = value;
-                teamsTable.label(() -> getThemeColorCode() + Strings.autoFixed(finalValue, 2)).expandX().center().get().setFontScale(fontScl);
-            } else {
-                for (Teams.TeamData teamData : teams) {
-                    teamsTable.label(() -> "[#" + teamData.team.color + "]" + Strings.autoFixed(checked.get(teamData.team), 2)).get().setFontScale(fontScl);
-                }
+        if (show) addTeamDate(table,icon, checked,sameValue,value);
+    }
+
+    private void addTeamDate(Table table, TextureRegion icon, Floatf<Team> checked, boolean sameValue, @Nullable float value){
+        teamsTable.row();
+        table.image(icon).size(15, 15).left();
+        if (sameValue) {
+            float finalValue = value;
+            teamsTable.label(() -> getThemeColorCode() + Strings.autoFixed(finalValue, 2)).expandX().center().get().setFontScale(fontScl);
+        } else {
+            for (Teams.TeamData teamData : teams) {
+                teamsTable.label(() -> "[#" + teamData.team.color + "]" + UI.arcFixed(checked.get(teamData.team), 2)).get().setFontScale(fontScl);
             }
         }
     }
