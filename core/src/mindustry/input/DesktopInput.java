@@ -710,6 +710,10 @@ public class DesktopInput extends InputHandler{
             settings.put("blockRenderLevel", (settings.getInt("blockRenderLevel") + 1) % 3);
         }
 
+        if (input.keyTap(Binding.toggle_unit)) {
+            ui.hudfrag.hudSettingsTable.forceHideUnit();
+        }
+
         if (input.keyTap(Binding.superUnitEffect)) {
             int level = settings.getInt("superUnitEffect");
             settings.put("superUnitEffect", (level + 1) % 3);
