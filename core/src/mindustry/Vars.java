@@ -522,6 +522,10 @@ public class Vars implements Loadable{
         return settings.getInt("minimapSize",minimapSize);
     }
 
+    public static String getThemeColorCode(){
+        return "[#" + getThemeColor() + "]";
+    }
+
     public static Color getThemeColor(){
         try {
             return Color.valueOf(settings.getString("themeColor"));

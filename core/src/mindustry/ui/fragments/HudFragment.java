@@ -108,7 +108,6 @@ public class HudFragment{
         });
 
         Events.on(WorldLoadEvent.class,e->{
-            otherCoreItemDisplay.updateTeamList();
             auxilliaryTable.toggle();
             hideObjectives = false;
             rebuildArcStatus();
