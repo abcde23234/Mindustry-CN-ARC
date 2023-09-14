@@ -31,11 +31,11 @@ import static mindustry.Vars.ui;
 public class Window {
     public WindowTable table;
     WindowManager manager;
-    String title, titlePrefix;
+    String title;
     Table cont;
     TextureRegion icon;
     public Image iconImage;
-    boolean removed = false, minSized = false, resizable = true, maxSizable = true, minSizable = true;
+    boolean removed = false, minSized = false, resizable = true, maxSizable = true, minSizable = true, closable = true;
     boolean cursorRestored = true;
     float minWidth = 200, minHeight = 200;
     private final ObjectMap<Enum<WindowEvents>, Seq<Cons<Window>>> events = new ObjectMap<>();
@@ -75,7 +75,7 @@ public class Window {
     }
 
     public void fadeOut() {
-        table.actions(Actions.sequence(Actions.alpha(1), Actions.fadeOut(10f / 60f)));
+        table.actions(Actions.sequence(Actions.alpha(1), Actions.fadeOut(10f / 60f), Actions.remove()));
     }
 
     public Window setIcon(TextureRegion icon) {
@@ -161,6 +161,14 @@ public class Window {
         if (!minSizable) table.cancelMinimize();
     }
 
+    public boolean isClosable() {
+        return closable;
+    }
+
+    public void setClosable(boolean closable) {
+        this.closable = closable;
+    }
+
     public boolean maximize(boolean maximize) {
         if (!maxSizable) return false;
         if (maximize) {
@@ -226,7 +234,8 @@ public class Window {
                 t.add(iconImage).size(12).pad(10, 12, 10, 12);
                 t.table(tt -> {
                     tt.add("").update(l -> {
-                        l.setText(calcString("[#" + (front == Window.this ? Color.black : Color.gray) + "]" +  title, l.getWidth()));
+                        l.setText(calcString(title, l.getWidth()));
+                        l.setColor((front == Window.this ? Color.white : Color.gray));
                     }).grow();
                     tt.addListener(new InputListener() {
                         float lastX, lastY;
@@ -266,7 +275,7 @@ public class Window {
                         maximize();
                     }
                 }).size(46, 28).pad(1).disabled(e -> !maxSizable).right();
-                t.button(Icon.cancelSmall, Styles.clearNonei, this::remove).size(46, 28).pad(1).right();
+                t.button(Icon.cancelSmall, Styles.clearNonei, this::remove).size(46, 28).pad(1).disabled(e -> !closable).right();
                 t.touchable = Touchable.enabled;
             }) {
                 @Override
@@ -416,7 +425,8 @@ public class Window {
         @Override
         public boolean remove() {
             manager.removeWindow(Window.this);
-            return super.remove();
+            fadeOut();
+            return true;
         }
 
         private String calcString(String input, float width) {

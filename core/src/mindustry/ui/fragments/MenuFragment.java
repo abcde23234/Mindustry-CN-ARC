@@ -166,8 +166,8 @@ public class MenuFragment{
 
         parent.fill(c -> c.top().left().table(t -> {
             t.background(Tex.buttonEdge4);
-            t.button("学术日报", cleart, MenuFragment::showArcNews).left().width(100).expandX();
-        }).left().update(t -> t.getChildren().get(0).setColor(haveNewerNews ? Tmp.c1.set(Color.white).lerp(Pal.accent, Mathf.absin(5f, 1f)) : Color.white)));
+            t.button("学术日报", cleart, MenuFragment::showArcNews).left().update(b -> b.setColor(haveNewerNews ? Tmp.c1.set(Color.white).lerp(Color.cyan, Mathf.absin(5f, 1f)) : Color.white)).growX();
+        }).left().width(100));
     }
 
     public static void fetchArcNews() {
@@ -201,7 +201,7 @@ public class MenuFragment{
                         haveNews = true;
                         int idx = news[i + 1].indexOf(' ');
                         int id = i;
-                        t.table(t2 -> t2.check("有更新时自动显示", b -> Core.settings.put("autoArcNews", b)).checked(Core.settings.getBool("autoArcNews", false)).row()).growX();
+                        t.table(t2 -> t2.check("有更新时自动显示", b -> Core.settings.put("autoArcNews", b)).checked(Core.settings.getBool("autoArcNews", false))).growX().row();
                         t.button(b -> {
                             b.clearChildren();
                             b.add(idx == -1 ? news[id + 1].substring(0, 10) + "..." : news[id + 1].substring(0, idx)).padLeft(5);
