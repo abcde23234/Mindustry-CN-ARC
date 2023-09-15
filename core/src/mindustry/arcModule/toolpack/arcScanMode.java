@@ -151,7 +151,7 @@ public class arcScanMode {
         totalEffHealth = 0;
         totalDps = 0;
         checkInit();
-        waveInfo thisWave = arcWave.get(Math.min(state.wave, Math.max(arcWave.size - 1, 0)));
+        waveInfo thisWave = arcWave.get(Math.min(state.wave - 1, Math.max(arcWave.size - 1, 0)));
         for (Tile tile : spawner.getSpawns()) {
             if (Mathf.dst(tile.worldx(), tile.worldy(), Core.input.mouseWorldX(), Core.input.mouseWorldY()) < state.rules.dropZoneRadius) {
                 float curve = Mathf.curve(Time.time % 240f, 120f, 240f);
