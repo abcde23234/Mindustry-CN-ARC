@@ -180,10 +180,9 @@ public class MenuFragment{
                     haveNewerNews = true;
                     if (Core.settings.getBool("autoArcNews", false)) Core.app.post(MenuFragment::showArcNews);
                 }
-            } catch (Exception e) {
-                Log.err(e);
+            } catch (Exception ignored) {
             }
-        });
+        }, e -> {});
     }
 
     public static void showArcNews() {
