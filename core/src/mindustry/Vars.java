@@ -515,7 +515,8 @@ public class Vars implements Loadable{
         }
     }
     public static int getMaxSchematicSize(){
-        return  Core.settings.getInt("maxSchematicSize");
+        int s = Core.settings.getInt("maxSchematicSize");
+        return s == 501 ? Integer.MAX_VALUE : s;
     }
 
     public static int getMinimapSize(){
