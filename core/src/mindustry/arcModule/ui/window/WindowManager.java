@@ -33,7 +33,7 @@ public class WindowManager {
     }
 
     public void removeWindow(Window w) {
-        w.remove();
+        if (!w.removed) w.remove();
         windows.remove(w);
     }
 

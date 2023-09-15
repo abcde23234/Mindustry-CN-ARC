@@ -162,7 +162,7 @@ public class MenuFragment{
         ));
 
         arcNewsLastUpdate = Core.settings.getLong("arcNewsLastUpdate", 0);
-        Events.on(EventType.ClientLoadEvent.class, event -> Timer.schedule(MenuFragment::fetchArcNews, 0, 60));
+        Events.on(EventType.ClientLoadEvent.class, event -> Timer.schedule(MenuFragment::fetchArcNews, 0, 300));
 
         parent.fill(c -> c.top().left().table(t -> {
             t.background(Tex.buttonEdge4);
@@ -197,18 +197,18 @@ public class MenuFragment{
                     boolean haveNews = false;
                     Table t = new Table();
                     ScrollPane p = new ScrollPane(t);
+                    t.table(t2 -> t2.check("有更新时自动显示", b -> Core.settings.put("autoArcNews", b)).checked(Core.settings.getBool("autoArcNews", false))).growX().row();
                     for (int i = 0; i < news.length; i += 3) {
                         haveNews = true;
                         int idx = news[i + 1].indexOf(' ');
                         int id = i;
-                        t.table(t2 -> t2.check("有更新时自动显示", b -> Core.settings.put("autoArcNews", b)).checked(Core.settings.getBool("autoArcNews", false))).growX().row();
                         t.button(b -> {
                             b.clearChildren();
                             b.add(idx == -1 ? news[id + 1].substring(0, 10) + "..." : news[id + 1].substring(0, idx)).padLeft(5);
                             b.add().grow();
                             b.add(formatTimeElapsed(Time.millis() - Long.parseLong(news[id]))).padRight(5);
                         }, RStyles.flatt, () -> {
-                            Window w = new Window();
+                            Window w = new Window(idx == -1 ? news[id + 1] : news[id + 1].substring(0, idx), 600, 400, Icon.book.getRegion(), ui.WindowManager);
                             Table content = new Table();
                             ScrollPane pane = new ScrollPane(content);
                             content.table(t2 -> {
@@ -250,11 +250,12 @@ public class MenuFragment{
                                                             case "image" -> {
                                                                 if (sb.length() != 0) there.add(sb.toString());
                                                                 Image img = there.image(Icon.refresh.getRegion()).size(64).get();
+                                                                img.setScaling(Scaling.fit);
                                                                 Http.get(cont, r -> {
                                                                     byte[] b = r.getResult();
                                                                     Core.app.post(() -> {
                                                                         Pixmap pix = new Pixmap(b);
-                                                                        finalThere.getCell(img).size(pix.width, pix.height);
+                                                                        finalThere.getCell(img).size(0).grow();
                                                                         img.setDrawable(new TextureRegion(new Texture(pix)));
                                                                         pix.dispose();
                                                                     });
@@ -290,7 +291,7 @@ public class MenuFragment{
                                     if (sb.length() != 0) there.add(sb.toString());
                                     t3.add(there);
                                 }).growX().row();
-                                t2.add(news[2]).align(Align.right);
+                                t2.add(news[id + 2]).align(Align.right);
                             }).pad(5).growX().row();
                             w.setBody(new Table(t2 -> {
                                 t2.setBackground(Styles.black3);

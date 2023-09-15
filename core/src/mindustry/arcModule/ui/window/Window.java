@@ -21,6 +21,7 @@ import arc.scene.ui.layout.Table;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.Align;
+import arc.util.Scaling;
 import arc.util.Tmp;
 import mindustry.gen.Icon;
 import mindustry.ui.Styles;
@@ -75,6 +76,7 @@ public class Window {
     }
 
     public void fadeOut() {
+        table.touchable = Touchable.disabled;
         table.actions(Actions.sequence(Actions.alpha(1), Actions.fadeOut(10f / 60f), Actions.remove()));
     }
 
@@ -231,6 +233,7 @@ public class Window {
             touchable = Touchable.childrenOnly;
             add(new Table(t -> {
                 iconImage = new Image(icon);
+                iconImage.setScaling(Scaling.fit);
                 t.add(iconImage).size(12).pad(10, 12, 10, 12);
                 t.table(tt -> {
                     tt.add("").update(l -> {
@@ -424,9 +427,13 @@ public class Window {
 
         @Override
         public boolean remove() {
-            manager.removeWindow(Window.this);
-            fadeOut();
-            return true;
+            if (removed) {
+                return super.remove();
+            } else {
+                manager.removeWindow(Window.this);
+                fadeOut();
+                return true;
+            }
         }
 
         private String calcString(String input, float width) {
