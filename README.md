@@ -5,28 +5,27 @@
 
 The automation tower defense RTS, written in Java.
 
-_[Trello Board](https://trello.com/b/aE2tcUwF/mindustry-40-plans)_  
-_[Wiki](https://mindustrygame.github.io/wiki)_  
-_[Javadoc](https://mindustrygame.github.io/docs/)_ 
-_[Original](https://github.com/Anuken/Mindustry)_ 
+_[资料导航站](https://docs.qq.com/sheet/DVEVob2xrcVBzQk5R)_  
+_[地图档案馆](https://docs.qq.com/sheet/DVGpmQ3lIR25rdnZo)_  
+_[蓝图档案馆](https://docs.qq.com/sheet/DVHNoS3lIcm1NbFFS)_ 
 
-Q群： 697981760 、602885791
+Q群： 697981760 、602885791  
+学术开发群：924017776。欢迎有能力改端的玩家加入！
 
 _[下载最新版本|前往最新构建版](https://github.com/Jackson11500/Mindustry-CN-ARC-Builds)_ 
 _[download latest version](https://github.com/Jackson11500/Mindustry-CN-ARC-Builds)_
 
-赞助广告联系Lucky Clover
 ## 学术端介绍
-完全功能提升性改端，提供各种辅助显示和功能，提供一端化完美解决方案。\
-包含大量游戏原版不显示机制，强烈建议至少已比较了解mindustry基础流程的玩家使用\
-初次使用有较长的适应时间，往往需要数小时熟悉功能和调整成自己舒服的设置，如无法接受请回退原版。\
+完全功能提升性改端，提供各种辅助显示和功能，提供一端化完美解决方案。    
+包含大量游戏原版不显示机制，强烈建议至少已比较了解mindustry基础流程的玩家使用   
+初次使用有较长的适应时间，往往需要数小时熟悉功能和调整成自己舒服的设置，如无法接受请回退原版。  
 
 学术端功能可参考这人视频 -> https://space.bilibili.com/135508593/
 
 ## 主要负责人
 [violet]Lucky_Clover
 ## 代码
-v3学术端制作团队：[violet]Lucky_Clover[white]、blac8、[blue]xkldklp[white]、[yellow]miner\
+v3学术端制作团队：[violet]Lucky_Clover[white]、squirrel、blac8、[blue]xkldklp[white]、[yellow]miner
 v2-支持：[green]Root[blue]Channel[white]、[blue]MyIndustry2[white]、[yellow]wayzer、[brown]Xor
 ## 翻译
 [lightblue]Somall_dumpling

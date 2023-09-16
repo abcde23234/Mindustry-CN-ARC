@@ -897,7 +897,7 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public static String arcFixed(float number, int maxDeci){
-
+        //适合从小数到大数的所有情况
         String sign = number < 0 ? "-" : "";
         number = Math.abs(number);
         if(number >= 1_000_000_000){
