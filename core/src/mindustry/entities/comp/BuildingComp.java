@@ -27,6 +27,7 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
+import mindustry.squirrelModule.modules.hack.Hack;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -2029,7 +2030,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Replace
     @Override
     public boolean inFogTo(Team viewer){
-        if(team == viewer || !state.rules.fog) return false;
+        if(Hack.noFog || team == viewer || !state.rules.fog) return false;
 
         int size = block.size, of = block.sizeOffset, tx = tile.x, ty = tile.y;
 
