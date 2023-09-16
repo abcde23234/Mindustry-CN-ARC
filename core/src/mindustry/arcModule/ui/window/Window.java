@@ -430,6 +430,7 @@ public class Window {
             if (removed) {
                 return super.remove();
             } else {
+                removed = true;
                 manager.removeWindow(Window.this);
                 fadeOut();
                 return true;
