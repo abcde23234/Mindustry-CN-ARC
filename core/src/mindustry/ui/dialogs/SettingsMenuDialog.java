@@ -643,6 +643,7 @@ public class SettingsMenuDialog extends BaseDialog{
             arc.checkPref("ShowInfoPopup", true);
             arc.checkPref("arcShareWaveInfo", false);
             arc.checkPref("arcAlwaysTeamColor", false);
+            arc.checkPref("arcSelfName", false);
 
             arc.addCategory("arcPlayerEffect");
             arc.stringInput("playerEffectColor", "ffd37f");
@@ -698,7 +699,7 @@ public class SettingsMenuDialog extends BaseDialog{
             arc.checkPref("menuFlyersFollower", false);
             arc.checkPref("menuFloatText", true);
             arc.checkPref("showUpdateDialog", true);
-            arc.checkPref("arcInfSchem", false, b -> Schematics.noLimit = b);
+            arc.checkPref("arcInfSchem", false);
 
             //////////forcehide
             forcehide.addCategory("arcCDisplayBlock");
