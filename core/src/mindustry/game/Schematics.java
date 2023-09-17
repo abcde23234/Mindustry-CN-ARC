@@ -61,13 +61,10 @@ public class Schematics implements Loadable{
     private FrameBuffer shadowBuffer;
     private Texture errorTexture;
     private long lastClearTime;
-    public static boolean noLimit = false;
 
     public Schematics(){
-
         Events.on(ClientLoadEvent.class, event -> {
             errorTexture = new Texture("sprites/error.png");
-            noLimit = Core.settings.getBool("arcInfSchem", false);
         });
     }
 
@@ -570,7 +567,7 @@ public class Schematics implements Loadable{
 
             int total = stream.readInt();
 
-            if(!noLimit && total > 128 * 128) throw new IOException("Invalid schematic: Too many blocks.");
+            if(!Core.settings.getBool("arcInfSchem") && total > 128 * 128) throw new IOException("Invalid schematic: Too many blocks.");
 
             Seq<Stile> tiles = new Seq<>(total);
             for(int i = 0; i < total; i++){
