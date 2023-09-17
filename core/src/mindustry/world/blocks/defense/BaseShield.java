@@ -6,13 +6,11 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.Vars;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.squirrelModule.modules.hack.Hack;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -44,11 +42,10 @@ public class BaseShield extends Block{
                 //instakill units that are stuck inside the shield (TODO or maybe damage them instead?)
                 unit.kill();
             }else{
-                if (Hack.ignoreShield && unit == Vars.player.unit() && overlapDst <= unit.hitSize * (unit.hitSize < 20 ? 1.4f : 1.48f)) return;
                 //stop
                 unit.vel.setZero();
                 //get out
-                unit.move(Tmp.v1.set(unit).sub(paramBuild).setLength(Hack.ignoreShield ? overlapDst - unit.hitSize * 1.5f : overlapDst));
+                unit.move(Tmp.v1.set(unit).sub(paramBuild).setLength(overlapDst + 0.01f));
 
                 if(Mathf.chanceDelta(0.12f * Time.delta)){
                     Fx.circleColorSpark.at(unit.x, unit.y, paramBuild.team.color);
@@ -125,11 +122,6 @@ public class BaseShield extends Block{
         public void drawShield(){
             if(!broken){
                 float radius = radius();
-                Unit unit = player.unit();
-                float hitSize = 0;
-                if (paramBuild != null) {
-                    hitSize = (unit.hitSize / 2f + paramBuild.radius()) - unit.hitSize * 2f;//keep trying
-                }
 
                 Draw.z(Layer.shields);
 
@@ -137,21 +129,12 @@ public class BaseShield extends Block{
 
                 if(renderer.animateShields){
                     Fill.poly(x, y, sides, radius);
-                    if (Hack.ignoreShield && unit.hitSize > 0) {
-                        Draw.color(player.team().color, Color.white, 0.7f);
-                        Draw.z(Layer.shields + 1);
-                        Fill.poly(x, y, sides, hitSize);
-                    }
                 }else{
                     Lines.stroke(1.5f);
                     Draw.alpha(0.09f + Mathf.clamp(0.08f * hit));
                     Fill.poly(x, y, sides, radius);
                     Draw.alpha(1f);
                     Lines.poly(x, y, sides, radius);
-                    if (Hack.ignoreShield && unit.hitSize > 0) {
-                        Draw.color(player.team().color, Color.white, 0.7f);
-                        Lines.poly(x, y, sides, hitSize);
-                    }
                     Draw.reset();
                 }
             }

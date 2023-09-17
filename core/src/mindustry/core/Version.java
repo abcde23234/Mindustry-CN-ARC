@@ -50,7 +50,7 @@ public class Version{
             arcBuild = Strings.canParseInt(map.get("build")) ? Integer.parseInt(map.get("build")) : -1;
         }
         Vars.arcVersion = Version.arcBuild + "";
-        Vars.arcVersionPrefix = "<ARCS~" + (Version.arcBuild <= 0 ? "Dev" : Version.arcBuild) + ">";
+        Vars.arcVersionPrefix = "<ARC~" + Version.arcBuild + ">";
     }
 
     /** @return whether the current game version is greater than the specified version string, e.g. "120.1"*/

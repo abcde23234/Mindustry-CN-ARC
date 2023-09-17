@@ -5,7 +5,6 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.game.*;
 import mindustry.gen.*;
-import mindustry.squirrelModule.modules.hack.Hack;
 import mindustry.type.*;
 
 import static mindustry.Vars.*;
@@ -30,17 +29,6 @@ abstract class BoundedComp implements Velc, Posc, Healthc, Flyingc{
             left = state.rules.limitX * tilesize;
             top = state.rules.limitHeight * tilesize + bot;
             right = state.rules.limitWidth * tilesize + left;
-        }
-
-        if (Hack.voidWalk) {
-            bot -= finalWorldBounds;
-            left -= finalWorldBounds;
-            top += finalWorldBounds;
-            right += finalWorldBounds;
-            Hack.boundX = left;
-            Hack.boundY = bot;
-            Hack.boundW = right - left;
-            Hack.boundH = top - bot;
         }
 
         if(!net.client() || isLocal()){

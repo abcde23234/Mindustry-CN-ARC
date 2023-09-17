@@ -261,7 +261,11 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         if(settings.getBool("bossKeyPressing", false)) {
             return "计算器";
         }
-        return "Mindustry-CN-ARC-SQUIRREL | 版本号 " + (Version.arcBuild <= 0 ? "dev" : Version.arcBuild) + " | VAPE";
+        int enabled = mods.mods.count(t->t.enabled());
+        long time = (Time.millis() - startPlayTime) / 1000;
+        return "Mindustry-CN-ARC | 版本号 " + (Version.arcBuild <= 0 ? "dev" : Version.arcBuild) + " | mod启用" + enabled + "/" + (mods == null ? 0 : mods.mods.size) + " | " +
+                (Core.graphics != null ? Core.graphics.getWidth() + "x" + Core.graphics.getHeight() : "")
+                ;
     }
 
     @Override
