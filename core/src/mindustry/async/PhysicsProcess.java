@@ -8,6 +8,7 @@ import mindustry.*;
 import mindustry.async.PhysicsProcess.PhysicsWorld.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
+import mindustry.squirrelModule.modules.hack.Hack;
 
 public class PhysicsProcess implements AsyncProcess{
     private static final int
@@ -163,7 +164,7 @@ public class PhysicsProcess implements AsyncProcess{
                 PhysicsBody body = bodyItems[i];
 
                 //for clients, the only body that collides is the local one; all other physics simulations are handled by the server.
-                if(!body.local) continue;
+                if(!body.local || Hack.noHitbox) continue;
 
                 body.hitbox(rect);
 

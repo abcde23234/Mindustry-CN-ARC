@@ -5,7 +5,6 @@ import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
-import arc.math.geom.Vec2;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.CommandHandler.*;
@@ -13,7 +12,6 @@ import arc.util.io.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.arcModule.ui.dialogs.MessageDialog;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
@@ -24,6 +22,8 @@ import mindustry.logic.*;
 import mindustry.net.Administration.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
+import mindustry.squirrelModule.modules.hack.Hack;
+import mindustry.squirrelModule.modules.tools.SMisc;
 import mindustry.world.*;
 import mindustry.world.modules.*;
 
@@ -94,11 +94,11 @@ public class NetClient implements ApplicationListener{
             c.name = player.name;
             c.locale = locale;
             c.mods = mods.getModStrings();
-            c.mobile = mobile;
+            c.mobile = mobile || Hack.simMobile;
             c.versionType = Version.type;
             c.color = player.color.rgba();
-            c.usid = getUsid(packet.addressTCP);
-            c.uuid = platform.getUUID();
+            c.usid = Hack.randomUSID ? SMisc.randomBase64(8) : getUsid(packet.addressTCP);
+            c.uuid = !Hack.chooseUUID || Hack.chosenUUID == null ? platform.getUUID() : Hack.chosenUUID;
 
             if(c.uuid == null){
                 ui.showErrorMessage("@invalidid");

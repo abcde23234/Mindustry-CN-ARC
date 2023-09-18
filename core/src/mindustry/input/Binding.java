@@ -39,6 +39,7 @@ public enum Binding implements KeyBind{
     schematic_menu(KeyCode.t),
 
     bossKey(KeyCode.f12),
+    hack(KeyCode.shiftRight),
 
     category_prev(KeyCode.comma, "blocks"),
     category_next(KeyCode.period),

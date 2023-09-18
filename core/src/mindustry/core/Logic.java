@@ -3,6 +3,7 @@ package mindustry.core;
 import arc.*;
 import arc.math.*;
 import arc.util.*;
+import arc.util.Timer;
 import mindustry.ai.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
@@ -12,6 +13,7 @@ import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.maps.*;
+import mindustry.squirrelModule.modules.hack.Hack;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
@@ -370,6 +372,7 @@ public class Logic implements ApplicationListener{
         state.gameOver = true;
         if(!headless){
             state.won = player.team() == winner;
+            if (Hack.autoGG) Timer.schedule(() -> Call.sendChatMessage("gg"), (float) Hack.autoGGDelay / 1000);
         }
     }
 

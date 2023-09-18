@@ -27,6 +27,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
+import mindustry.squirrelModule.modules.hack.Hack;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.Block;
@@ -192,7 +193,7 @@ public class SchematicsDialog extends BaseDialog{
 
             t.update(() -> {
                 if(Core.input.keyTap(Binding.chat) && Core.scene.getKeyboardFocus() == searchField && firstSchematic != null){
-                    if(!state.rules.schematicsAllowed){
+                    if(!state.rules.schematicsAllowed && !Hack.allowBlue){
                         ui.showInfo("@schematic.disabled");
                     }else{
                         control.input.useSchematic(firstSchematic);
@@ -263,7 +264,7 @@ public class SchematicsDialog extends BaseDialog{
                         if(state.isMenu()){
                             showInfo(s);
                         }else{
-                            if(!state.rules.schematicsAllowed){
+                            if(!state.rules.schematicsAllowed && !Hack.allowBlue){
                                 ui.showInfo("@schematic.disabled");
                             }else{
                                 control.input.useSchematic(s);

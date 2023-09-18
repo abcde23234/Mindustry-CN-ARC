@@ -23,6 +23,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.squirrelModule.modules.hack.Hack;
 import mindustry.type.UnitType;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -860,10 +861,10 @@ public class DesktopInput extends InputHandler{
             target = null;
         }
         if (type.omniMovement && type.faceTarget && unit.isShooting) {
-            unit.lookAt(lookAtAngle);
+            if (!Hack.ignoreTurn) unit.lookAt(lookAtAngle);
         }
         else {
-            unit.lookAt(unit.prefRotation());
+            if (!Hack.ignoreTurn) unit.lookAt(unit.prefRotation());
         }
 
         unit.movePref(movement);

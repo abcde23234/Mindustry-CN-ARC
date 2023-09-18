@@ -31,6 +31,7 @@ import mindustry.graphics.*;
 import mindustry.input.Placement.*;
 import mindustry.net.Administration.*;
 import mindustry.net.*;
+import mindustry.squirrelModule.modules.hack.Hack;
 import mindustry.type.*;
 import mindustry.ui.fragments.*;
 import mindustry.world.*;
@@ -41,8 +42,6 @@ import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
-import mindustry.ui.*;
-import arc.util.pooling.*;
 
 import java.util.*;
 
@@ -252,7 +251,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 unit.lastCommanded = player.coloredName();
                 
                 //remove when other player command
-                if(!headless && player != Vars.player){
+                if(!Hack.forceControl && !headless && player != Vars.player){
                     control.input.selectedUnits.remove(unit);
                 }
             }
