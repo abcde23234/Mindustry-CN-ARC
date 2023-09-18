@@ -382,9 +382,7 @@ public class SettingsMenuDialog extends BaseDialog{
                 game.checkPref("crashreport", true);
             }
 
-            game.sliderPref("maxSchematicSize", 32, 32, 501, 1, v -> {
-                return v == 501 ? "无限" : String.valueOf(v);
-            });
+            game.sliderPref("maxSchematicSize", 32, 32, 256, 1, v -> v == 256 ? "无限" : String.valueOf(v));
             game.checkPref("savecreate", true);
             game.checkPref("blockreplace", true);
             game.checkPref("conveyorpathfinding", true);
