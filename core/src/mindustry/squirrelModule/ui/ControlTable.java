@@ -2,6 +2,8 @@ package mindustry.squirrelModule.ui;
 
 import arc.Core;
 import arc.graphics.Color;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Lines;
 import arc.input.KeyCode;
 import arc.math.geom.Vec2;
 import arc.scene.Element;
@@ -22,7 +24,7 @@ import mindustry.squirrelModule.modules.tools.SMisc;
 import static mindustry.Vars.ui;
 
 public class ControlTable extends Table {
-    static final float lineAdd = 2f;
+    static final float lineAdd = 0.07f;
     ObjectMap<String, Seq<Config>> list;
 
     public ControlTable(ObjectMap<String, Seq<Config>> seq) {
@@ -88,18 +90,15 @@ public class ControlTable extends Table {
                 t1.table(t2 -> seq.each(conf -> {
                     int id = num[0]++;
                     boolean[] configShowed = {false};
-                    float[] rot = {0};
                     Cell<?>[] settings = {null};
                     final Config value = conf;
                     final String name = conf.displayName;
                     t2.table(t3 -> {
-                        t3.table(t4 -> {
+                        t3.add(new Table(t4 -> {
                             t4.touchable = Touchable.enabled;
-                            t4.update(() -> rot[0] = ui.infoControl.getColor() + 90);
                             t4.add(name).update(l -> {
                                 if (value.enabled) {
                                     l.setText("[#444444]" + name);
-                                    t4.setBackground(SStyles.tint(SMisc.color((rot[0] + id * lineAdd) % 180)));
                                 } else {
                                     l.setText(name);
                                     t4.setBackground(gray);
@@ -116,6 +115,18 @@ public class ControlTable extends Table {
                                 value.func.onChanged(value.enabled);
                                 Core.settings.put(value.internalName + "e", value.enabled);
                             });
+                        }) {
+                            @Override
+                            protected void drawBackground(float x, float y) {
+                                if (!value.enabled) {
+                                    super.drawBackground(x, y);
+                                    return;
+                                }
+                                for (float i = 0; i < height; i++) {
+                                    Draw.color(getColor(id, i));
+                                    Lines.line(x, y + i, x + width, y + i);
+                                }
+                            }
                         }).grow();
                         if (value.element != null && value.element.length != 0) t3.table(t4 -> {
                             t4.touchable = Touchable.enabled;
@@ -152,5 +163,9 @@ public class ControlTable extends Table {
                 })).minWidth(250).visible(() -> expand);
             });
         }
+    }
+
+    private static Color getColor(int id, float off) {
+        return SMisc.color(ui.infoControl.getColor() + id * lineAdd * 40 + lineAdd * (40 - off));
     }
 }

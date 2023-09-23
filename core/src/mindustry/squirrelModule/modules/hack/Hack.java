@@ -45,8 +45,8 @@ public class Hack {
     public static String chosenUUID = null;
     public static int autoGGDelay;
 
-    public static boolean immediatelyTurn, ignoreTurn, unitTrans, noKB, noHitbox, noSpawnKB, infDrag, immeMove, ignoreShield, voidWalk;
-    public static float KBMulti, boundX, boundY, boundW, boundH;
+    public static boolean immediatelyTurn, ignoreTurn, unitTrans, noKB, noHitbox, noSpawnKB, infDrag, immeMove, ignoreShield, voidWalk, speed;
+    public static float KBMulti, boundX, boundY, boundW, boundH, speedMulti;
     public static boolean weaponImmeTurn, forceControl, holdFill, autoFill, allowBlue;
     public static int holdFillInterval, holdFillMinItem, autoFillInterval, autoFillMaxCount;
     public static long lastFillTime, lastAutoFillTime;
@@ -84,6 +84,7 @@ public class Hack {
             Lines.rect(boundX, boundY, boundW, boundH);
             Draw.reset();
         });
+        manager.register("移动", "speed", new Config("单位加速", new Element[]{new Label(""), slider("速度倍率", 1f, 5f, 0.01f, 1f, f -> speedMulti = f, 0, f -> "单位速度倍率 " + speedMulti)}, changed(e -> speed = e)));
 
         manager.register("交互", "weaponImmeTurn", new Config("武器瞬间转向", null, changed(e -> weaponImmeTurn = e)));
         manager.register("交互", "forceControl", new Config("强制控制", null, changed(e -> forceControl = e)));
