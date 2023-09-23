@@ -5,6 +5,7 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
 import arc.input.KeyCode;
+import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import arc.scene.Element;
 import arc.scene.Group;
@@ -17,6 +18,7 @@ import arc.scene.ui.layout.Cell;
 import arc.scene.ui.layout.Table;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
+import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.squirrelModule.modules.hack.Config;
 import mindustry.squirrelModule.modules.tools.SMisc;
@@ -24,7 +26,7 @@ import mindustry.squirrelModule.modules.tools.SMisc;
 import static mindustry.Vars.ui;
 
 public class ControlTable extends Table {
-    static final float lineAdd = 0.07f;
+    static float lineAdd = 0.06f, rotateDiv = 5f;
     ObjectMap<String, Seq<Config>> list;
 
     public ControlTable(ObjectMap<String, Seq<Config>> seq) {
@@ -122,8 +124,8 @@ public class ControlTable extends Table {
                                     super.drawBackground(x, y);
                                     return;
                                 }
-                                for (float i = 0; i < height; i++) {
-                                    Draw.color(getColor(id, i));
+                                for (float i = 0; i <= height; i++) {
+                                    Draw.color(SMisc.color((((Time.globalTime / rotateDiv) % (Mathf.PI * 20)) + id * lineAdd * 40 + (40 - i) * lineAdd) % (Mathf.PI * 20)));
                                     Lines.line(x, y + i, x + width, y + i);
                                 }
                             }
@@ -163,9 +165,5 @@ public class ControlTable extends Table {
                 })).minWidth(250).visible(() -> expand);
             });
         }
-    }
-
-    private static Color getColor(int id, float off) {
-        return SMisc.color(ui.infoControl.getColor() + id * lineAdd * 40 + lineAdd * (40 - off));
     }
 }

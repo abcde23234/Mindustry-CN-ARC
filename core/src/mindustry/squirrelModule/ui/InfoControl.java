@@ -2,6 +2,7 @@ package mindustry.squirrelModule.ui;
 
 import arc.Core;
 import arc.graphics.Color;
+import arc.math.Mathf;
 import arc.scene.Group;
 import arc.scene.ui.layout.Table;
 import arc.util.Align;
@@ -14,7 +15,6 @@ import mindustry.squirrelModule.modules.tools.SMisc;
 
 public class InfoControl {
     public static final float step = 0.1f, lineAdd = 1.5f;
-    public Color theme;
     public Manager manager;
     Table table = new Table();
     float color = 0;
@@ -40,19 +40,18 @@ public class InfoControl {
     private void update() {
         if (Core.input.keyTap(Binding.hack)) manager.controlGroup.visible = !manager.controlGroup.visible;
         final float[] thisColor = {color};
-        theme = SMisc.color(color);
         if (table.visible) {
             table.clear();
             table.table(t -> t.add(SMisc.packColor(thisColor[0]) + "VAPE").fontScale(2.5f).pad(50, 5, 0, 5)).left().row();
             table.table(t -> manager.flatList.each((k, v) -> {
                 if (!v.enabled) return;
                 table.add(SMisc.packColor(thisColor[0]) + v.displayName + " [white]" + v.func.text()).fontScale(1.25f).pad(0, 5, 0, 5).left().row();
-                thisColor[0] = (thisColor[0] + lineAdd) % 180;
+                thisColor[0] = (thisColor[0] + lineAdd) % (Mathf.PI * 20);
             })).left();
             table.toFront();
         }
         manager.controlGroup.toFront();
-        color = (color + step * Time.delta) % 180;
+        color = (color + step * Time.delta) % (Mathf.PI * 20);
     }
 
     public Config getConfig(String name) {

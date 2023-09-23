@@ -16,8 +16,9 @@ import mindustry.arcModule.ui.window.Window;
 import javax.swing.text.Element;
 
 public class SMisc {
+    private static final Color tmp = new Color();
     public static Color color(float rot) {
-        return new Color(Color.packRgba((int) (Mathf.sin(0.1f * rot) * 127 + 128), (int) (Mathf.sin(0.1f * rot + 2 * Mathf.PI / 3) * 127 + 128), (int) (Math.sin(0.1f * rot + 4 * Mathf.PI / 3) * 127 + 128), 255));
+        return tmp.set(Color.packRgba((int) (Mathf.sin(0.1f * rot) * 127 + 128), (int) (Mathf.sin(0.1f * rot + 2 * Mathf.PI / 3) * 127 + 128), (int) (Math.sin(0.1f * rot + 4 * Mathf.PI / 3) * 127 + 128), 255));
     }
 
     public static String packColor(float rot) {
