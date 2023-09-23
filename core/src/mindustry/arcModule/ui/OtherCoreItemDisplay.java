@@ -8,9 +8,9 @@ import arc.scene.ui.TextButton;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Nullable;
-import arc.util.Strings;
 import arc.util.Time;
 import mindustry.Vars;
+import mindustry.arcModule.NumberFormat;
 import mindustry.arcModule.ui.dialogs.TeamSelectDialog;
 import mindustry.content.Blocks;
 import mindustry.content.UnitTypes;
@@ -232,10 +232,10 @@ public class OtherCoreItemDisplay extends Table {
         table.image(icon).size(15, 15).left();
         if (sameValue) {
             float finalValue = value;
-            teamsTable.label(() -> getThemeColorCode() + Strings.autoFixed(finalValue, 2)).expandX().center().get().setFontScale(fontScl);
+            teamsTable.label(() -> getThemeColorCode() + NumberFormat.autoFixed(finalValue)).expandX().center().get().setFontScale(fontScl);
         } else {
             for (Teams.TeamData teamData : teams) {
-                teamsTable.label(() -> "[#" + teamData.team.color + "]" + UI.arcFixed(checked.get(teamData.team), 2)).get().setFontScale(fontScl);
+                teamsTable.label(() -> "[#" + teamData.team.color + "]" + NumberFormat.autoFixed(checked.get(teamData.team))).get().setFontScale(fontScl);
             }
         }
     }

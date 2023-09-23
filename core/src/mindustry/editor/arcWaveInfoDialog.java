@@ -1041,14 +1041,14 @@ public class arcWaveInfoDialog extends BaseDialog {
                 c.row();
                 if (showUnitSelect) {
                     c.table(list -> {
-                        int i = 0;
                         for (UnitType unit : content.units()) {
-                            if (i++ % 8 == 0) list.row();
+                            if (unit.internal) continue;
                             list.button(unit.emoji(), flatToggleMenut, () -> {
                                 if (spawnUnit.contains(unit)) spawnUnit.remove(unit);
                                 else spawnUnit.add(unit);
                                 rebuild[0].run();
                             }).tooltip(unit.localizedName).checked(spawnUnit.contains(unit)).size(50f);
+                            if (list.getChildren().size % 8 ==0) list.row();
                         }
                     }).row();
                     c.table(ct -> {

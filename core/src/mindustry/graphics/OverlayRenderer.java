@@ -128,9 +128,9 @@ public class OverlayRenderer{
 
         InputHandler input = control.input;
 
-        Sized select = input.selectedUnit();
+        Sized select = ui.hudfrag.hudSettingsTable.unitHide ? null : input.selectedUnit();
         if(select == null) select = input.selectedControlBuild();
-        if(ui.hudfrag.hudSettingsTable.unitHide || !Core.input.keyDown(Binding.control) || !state.rules.possessionAllowed) select = null;
+        if(!Core.input.keyDown(Binding.control) || !state.rules.possessionAllowed) select = null;
 
         unitFade = Mathf.lerpDelta(unitFade, Mathf.num(select != null), 0.1f);
 
