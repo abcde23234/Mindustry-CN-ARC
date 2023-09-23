@@ -149,7 +149,7 @@ public class MenuFragment{
             textLabel.setFontScale((base == 0 ? 1f : base) * Math.abs(Time.time % period / period - 0.5f) * varSize + 1);
             textLabel.setText(text);
         });
-        Events.on(EventType.ClientLoadEvent.class, event -> Time.run(10f, () -> Http.get("https://cn-arc.github.io/labels?t=" + Time.millis())
+        Events.on(EventType.ClientLoadEvent.class, event -> Core.app.post(() -> Http.get("https://cn-arc.github.io/labels?t=" + Time.millis())
                 .error(e -> {
                     Log.err("获取最新主页标语失败!加载本地标语", e);
                     labels = Core.files.internal("labels").readString("UTF-8").replace("\r", "").replace("\\n", "\n").replace("/n", "\n").split("\n");
